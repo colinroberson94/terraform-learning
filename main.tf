@@ -8,11 +8,6 @@ variable "server_port" {
   default     = 80
 }
 
-# resource "random_string" "random" {
-#   length  = 8
-#   special = false
-# }
-
 data "aws_vpc" "default" {
   default = true
 }
@@ -31,11 +26,8 @@ resource "aws_launch_template" "example" {
   vpc_security_group_ids = [aws_security_group.instance.id]
 
   user_data = filebase64("userdata.sh")
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
+
 resource "aws_autoscaling_group" "example" {
   launch_template {
     id      = aws_launch_template.example.id
