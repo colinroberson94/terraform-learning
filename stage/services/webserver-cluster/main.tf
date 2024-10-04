@@ -1,11 +1,11 @@
 terraform {
   backend "s3" {
     bucket = "colins-terraform-testing-remote-state"
-    key = "global/s3/terraform.tfstate"
+    key    = "stage/services/webserver-cluster/terraform.tfstate"
     region = "us-west-2"
 
     dynamodb_table = "terraform-learning-locks"
-    encrypt = true
+    encrypt        = true
   }
 }
 

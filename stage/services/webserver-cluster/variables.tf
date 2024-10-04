@@ -14,3 +14,16 @@ data "aws_subnets" "default" {
     values = [data.aws_vpc.default.id]
   }
 }
+
+# this will allow us to access the state file of the database.
+# Because all outputs are stored in the state file, we can then
+# use this to read the database address and port.
+data "terraform_remote_state" "db" {
+  backend = "s3"
+
+  config = {
+    bucket = "colins-terraform-testing-remote-state"
+    key = "stage/data-stores/mysql/terraform.tfstate"
+    region = "us-west-2"
+  }
+}
