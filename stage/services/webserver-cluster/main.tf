@@ -9,27 +9,6 @@ terraform {
   }
 }
 
-provider "aws" {
-  region = "us-west-2"
-}
-
-variable "server_port" {
-  description = "The port the server will use for HTTP requests"
-  type        = number
-  default     = 80
-}
-
-data "aws_vpc" "default" {
-  default = true
-}
-
-data "aws_subnets" "default" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
-  }
-}
-
 resource "aws_launch_template" "example" {
   name                   = "example_launch_template"
   image_id               = "ami-08d8ac128e0a1b91c"
@@ -160,9 +139,4 @@ resource "aws_lb_target_group" "asg" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
   }
-}
-
-output "alb_dns_name" {
-  value       = aws_lb.example.dns_name
-  description = "The domain name of the load balancer"
 }
