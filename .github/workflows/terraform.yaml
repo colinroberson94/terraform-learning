@@ -14,11 +14,16 @@ jobs:
     plan:
         name: Terraform plan
         runs-on: ubuntu-latest
+
+        permissions:
+          id-token: write
+          contents: read
+
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Configure AWS IAM Role
+            - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v4
               with:
                 role-to-assume: arn:aws:iam::923377182840:role/GithubActions-Terraform-Learning
@@ -36,12 +41,18 @@ jobs:
         needs: plan
         if: github.ref == 'refs/heads/main'
         runs-on: ubuntu-latest
+
+        permissions:
+          id-token: write
+          contents: read
+          
         steps:
-            - name: Configure AWS IAM Role
+            - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v4
               with:
                 role-to-assume: arn:aws:iam::923377182840:role/GithubActions-Terraform-Learning
                 aws-region: us-east-1
+
             - name: Initialize poject and deploy terraform
               run: |
                 cd terraform
