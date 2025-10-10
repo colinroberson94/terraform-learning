@@ -20,14 +20,7 @@ jobs:
           contents: read
 
         steps:
-            - name: Setup Terraform
-              uses: hashicorp/setup-terraform@v3
-
-            - name: Checkout code
-              uses: actions/checkout@v4
-
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v4
+            - uses: ./.github/actions/terraform-setup
               with:
                 role-to-assume: arn:aws:iam::923377182840:role/GithubActions-Terraform-Learning
                 aws-region: us-east-1
@@ -50,19 +43,11 @@ jobs:
           contents: read
           
         steps:
-            - name: Setup Terraform
-              uses: hashicorp/setup-terraform@v3
-
-            - name: Checkout code
-              uses: actions/checkout@v4
-
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v4
+            - uses: ./.github/actions/terraform-setup
               with:
                 role-to-assume: arn:aws:iam::923377182840:role/GithubActions-Terraform-Learning
                 aws-region: us-east-1
-
-            - name: Initialize poject and deploy terraform
+            - name: Initialize project and deploy terraform
               run: |
                 cd terraform
                 terraform fmt
