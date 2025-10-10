@@ -20,7 +20,8 @@ jobs:
           contents: read
 
         steps:
-            - uses: colinroberson94/terraform-learning/.github/actions/terraform-setup
+            - uses: actions/checkout@v4
+            - uses: ./.github/actions/terraform-setup
               with:
                 role-to-assume: arn:aws:iam::923377182840:role/GithubActions-Terraform-Learning
                 aws-region: us-east-1
@@ -43,7 +44,8 @@ jobs:
           contents: read
           
         steps:
-            - uses: colinroberson94/terraform-learning/.github/actions/terraform-setup
+            - uses: actions/checkout@v4
+            - uses: ./.github/actions/terraform-setup
               with:
                 role-to-assume: arn:aws:iam::923377182840:role/GithubActions-Terraform-Learning
                 aws-region: us-east-1
