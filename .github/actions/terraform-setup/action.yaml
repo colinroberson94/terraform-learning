@@ -1,5 +1,7 @@
+# Used to "DRY" up my the Terraform workflow by reducing repeat code.
+# Handles the Terraform setup and AWS role configuration
 name: Setup Terraform
-description: Checkout repo, install terraform, configure AWS credentials
+description: install terraform, configure AWS credentials
 
 inputs:
   role-to-assume:

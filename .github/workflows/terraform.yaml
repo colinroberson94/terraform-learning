@@ -1,11 +1,14 @@
 name: Plan and Apply Terraform
 
 on: 
-    workflow_dispatch:              # allows the job to be manually triggered
+    # allows the job to be manually triggered
+    workflow_dispatch:              
+    # This action is triggered if there is a push to main,  specifically in the terraform directory
     push:                            
-        branches: [main]            # This action is triggered if there is a push to main
-        paths: ["terraform/**"]     # specifically in the terraform directory
-    pull_request:                   # also trigerred by pull requests
+        branches: [main]            
+        paths: ["terraform/**"]
+    # also trigerred by pull requests
+    pull_request:                   
         branches: [main]
         paths: ["terraform/**"]
 
@@ -18,21 +21,25 @@ jobs:
           contents: read
 
         steps:
-            - uses: actions/checkout@v4
-            - uses: ./.github/actions/terraform-setup
-              with:
+            # Checkout code from repo
+            - uses: actions/checkout@v4    
+            # runs composite action, `Setup Terraform`
+            - uses: ./.github/actions/terraform-setup 
+              # the following parameters are passed into the composite action
+              with:                                       
                 role-to-assume: arn:aws:iam::923377182840:role/GithubActions-Terraform-Learning
                 aws-region: us-east-1
 
-            - name: Initialize project and view Terraform Plan
+            - name: Initialize project and add Terraform Plan to artifacts
               run: |
                 cd terraform
                 terraform fmt
                 terraform init
                 terraform plan -no-color -out=tfplan
                 terraform show -no-color tfplan > plan.txt
-
-            - name: Upload plan artifacts
+            # Upload tfplan and plan.txt as artifact
+            # tfplan will be used by subsequent terraform apply, whereas plan.txt can be reviewed by approver
+            - name: Upload plan artifacts                
               uses: actions/upload-artifact@v4
               with:
                 name: terraform-plan
@@ -42,26 +49,30 @@ jobs:
 
     deploy:
         name: Terraform deploy
-        needs: plan
-        if: github.ref == 'refs/heads/main'
         runs-on: ubuntu-latest
-        environment: production
+        needs: plan
         permissions:
           id-token: write
           contents: read
-          
+        # runs only on pushes to main
+        if: github.ref == 'refs/heads/main'
+        # ties job to the `production` environment
+        # In this case, this ensures this job isn't run until it has been approved
+        environment: production
+
         steps:
             - uses: actions/checkout@v4
             - uses: ./.github/actions/terraform-setup
               with:
                 role-to-assume: arn:aws:iam::923377182840:role/GithubActions-Terraform-Learning
                 aws-region: us-east-1
+            # Download tfplan and plan.txt artifacts
             - name: Download plan artifact
               uses: actions/download-artifact@v4
               with:
                 name: terraform-plan
                 path: terraform/
-                
+            # apply tfplan downloaded from artifacts 
             - name: Apply approved terraform
               run: |
                 cd terraform
