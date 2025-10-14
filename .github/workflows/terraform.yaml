@@ -1,11 +1,10 @@
-name: Plan and Apply terraform in "terraform/**"
+name: Plan and Apply Terraform
 
 on: 
     workflow_dispatch:              # allows the job to be manually triggered
     push:                            
         branches: [main]            # This action is triggered if there is a push to main
         paths: ["terraform/**"]     # specifically in the terraform directory
-    
     pull_request:                   # also trigerred by pull requests
         branches: [main]
         paths: ["terraform/**"]
@@ -14,7 +13,6 @@ jobs:
     plan:
         name: Terraform plan
         runs-on: ubuntu-latest
-
         permissions:
           id-token: write
           contents: read
@@ -31,7 +29,16 @@ jobs:
                 cd terraform
                 terraform fmt
                 terraform init
-                terraform plan
+                terraform plan -no-color -out=tfplan
+                terraform show -no-color tfplan > plan.txt
+
+            - name: Upload plan artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                name: terraform-plan
+                path: |
+                    terraform/tfplan
+                    terraform/plan.txt
 
     deploy:
         name: Terraform deploy
@@ -49,9 +56,14 @@ jobs:
               with:
                 role-to-assume: arn:aws:iam::923377182840:role/GithubActions-Terraform-Learning
                 aws-region: us-east-1
-            - name: Initialize project and deploy terraform
+            - name: Download plan artifact
+              uses: actions/download-artifact@4
+              with:
+                name: terraform-plan
+                path: terraform/
+                
+            - name: Apply approved terraform
               run: |
                 cd terraform
-                terraform fmt
-                terraform init
-                terraform apply --auto-approve=true
+                terraform init -input=false
+                terraform apply -input=false tfplan
