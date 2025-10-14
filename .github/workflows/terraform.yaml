@@ -57,7 +57,7 @@ jobs:
                 role-to-assume: arn:aws:iam::923377182840:role/GithubActions-Terraform-Learning
                 aws-region: us-east-1
             - name: Download plan artifact
-              uses: actions/download-artifact@4
+              uses: actions/download-artifact@v4
               with:
                 name: terraform-plan
                 path: terraform/
