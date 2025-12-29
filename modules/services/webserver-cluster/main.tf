@@ -9,7 +9,7 @@ locals {
 resource "aws_launch_template" "example" {
   name = "${var.cluster_name}-template-example"
 
-  image_id                             = "ami-0fb653ca2d3203ac1"
+  image_id                             = var.ami
   instance_initiated_shutdown_behavior = "terminate"
   instance_type                        = var.instance_type
   vpc_security_group_ids               = [aws_security_group.instance.id]
@@ -18,6 +18,7 @@ resource "aws_launch_template" "example" {
     server_port = var.server_port
     db_address  = data.terraform_remote_state.db.outputs.address
     db_port     = data.terraform_remote_state.db.outputs.port
+    server_text = var.server_text
   }))
 }
 
@@ -110,7 +111,7 @@ resource "aws_security_group_rule" "allow_all_outbound" {
 
 resource "aws_lb_target_group" "asg" {
   name     = "${var.cluster_name}-target-group"
-  port     = local.http_port
+  port     = var.server_port
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.default.id
 
